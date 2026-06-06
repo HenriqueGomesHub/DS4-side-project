@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Authors>DS4Bridge</Authors>
+    <Product>DS4Bridge</Product>
+    <Copyright>(c) 2026</Copyright>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+</Project>

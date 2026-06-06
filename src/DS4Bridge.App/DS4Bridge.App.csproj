@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>DS4Bridge.App</RootNamespace>
+    <AssemblyName>DS4Bridge</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Serilog" Version="3.1.1" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Nefarius.ViGEm.Client" Version="1.21.256" />
+    <PackageReference Include="HidSharp" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2592.51" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DS4Bridge.Core\DS4Bridge.Core.csproj" />
+    <ProjectReference Include="..\DS4Bridge.Hid\DS4Bridge.Hid.csproj" />
+    <ProjectReference Include="..\DS4Bridge.Virtual\DS4Bridge.Virtual.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" Condition="Exists('Assets\app.ico')" />
+  </ItemGroup>
+  <PropertyGroup>
+    <ApplicationIcon Condition="Exists('Assets\app.ico')">Assets\app.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Web UI assets — built from /ui by 'BuildWebUI' MSBuild target -->
+    <EmbeddedResource Include="wwwroot\**\*.*" LogicalName="wwwroot/%(RecursiveDir)%(Filename)%(Extension)" Condition="Exists('wwwroot')" />
+  </ItemGroup>
+  <Target Name="BuildWebUI" BeforeTargets="BeforeBuild" Condition="'$(SkipWebUIBuild)' != 'true'">
+    <PropertyGroup>
+      <UiSourceDir>$(MSBuildThisFileDirectory)..\..\ui</UiSourceDir>
+      <UiOutputDir>$(MSBuildThisFileDirectory)wwwroot</UiOutputDir>
+    </PropertyGroup>
+    <Message Importance="high" Text="Building React UI from $(UiSourceDir)..." />
+    <Exec Command="npm install --no-audit --no-fund --silent" WorkingDirectory="$(UiSourceDir)" Condition="!Exists('$(UiSourceDir)\node_modules')" />
+    <Exec Command="npm run build --silent" WorkingDirectory="$(UiSourceDir)" />
+    <ItemGroup>
+      <_UiArtifacts Include="$(UiSourceDir)\dist\**\*.*" />
+    </ItemGroup>
+    <RemoveDir Directories="$(UiOutputDir)" Condition="Exists('$(UiOutputDir)')" />
+    <Copy SourceFiles="@(_UiArtifacts)" DestinationFiles="@(_UiArtifacts->'$(UiOutputDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+</Project>
